@@ -1,0 +1,2 @@
+#!/bin/sh
+exec java -cp "$APPDIR/wrapper/*" org.gradle.wrapper.GradleWrapperMain "$@"
