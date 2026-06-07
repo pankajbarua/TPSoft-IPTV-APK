@@ -1,2 +1,13 @@
 #!/bin/sh
-exec java -cp "$APPDIR/wrapper/*" org.gradle.wrapper.GradleWrapperMain "$@"
+#
+# Gradle startup script for Unix
+#
+
+DEFAULT_JVM_OPTS=""
+APP_BASE_NAME=basename "$0"
+APP_HOME=dirname "$0"
+
+# Add default JVM options here
+DEFAULT_JVM_OPTS='"-Dorg.gradle.appname=$APP_BASE_NAME"'
+
+exec java $DEFAULT_JVM_OPTS -cp "$APP_HOME/wrapper/*" org.gradle.wrapper.GradleWrapperMain "$@"
