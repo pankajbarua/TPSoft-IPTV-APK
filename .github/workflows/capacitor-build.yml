@@ -1,0 +1,67 @@
+name: Build Capacitor APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15  # ১৫ মিনিটই যথেষ্ট
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Install Capacitor
+      run: |
+        npm install @capacitor/core @capacitor/cli @capacitor/android
+        npm install @capacitor/network @capacitor/app
+    
+    - name: Create Capacitor config
+      run: |
+        cat > capacitor.config.json << EOF
+        {
+          "appId": "com.tpsoft.iptv",
+          "appName": "TPSoft IPTV",
+          "webDir": "www",
+          "server": {
+            "androidScheme": "https"
+          }
+        }
+        EOF
+    
+    - name: Setup project
+      run: |
+        mkdir -p www
+        cp index.html www/
+        npx cap init TPSoft IPTV com.tpsoft.iptv
+        npx cap add android
+    
+    - name: Sync and build
+      run: |
+        npx cap sync android
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug --no-daemon
+    
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: TPSoft-IPTV
+        path: android/app/build/outputs/apk/debug/*.apk
